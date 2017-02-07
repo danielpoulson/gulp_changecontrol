@@ -64,7 +64,7 @@ gulp.task('html', function(){
 
 gulp.task('js', () => {
 	browserify(config.paths.mainJs)
-		.transform("babelify", {presets: ["es2015", "react", "stage-0"]})
+		.transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
 		.bundle()
 		.on('error', (err) => log(err.stack)) 
 		.pipe(source('bundle.js'))
