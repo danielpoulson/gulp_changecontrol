@@ -1,7 +1,6 @@
 'use strict';
 
 const gulp = require('gulp');
-const args = require('yargs').argv;
 const $ = require('gulp-load-plugins')();
 const browserify = require('browserify'); // Bundles JS
 const browserSync = require('browser-sync').create();
@@ -21,8 +20,9 @@ const config = {
         js: './src/**/*.js',
         sass: './src/**/*.*css',
         images: './src/images/*',
-        css: [
-            './src/style.css'
+        toMove: [
+            './server/**/*.*',
+            './server.js'
         ],
         dist: './dist',
         mainJs: './src/index.js',
@@ -30,102 +30,61 @@ const config = {
 	}
 };
 
-gulp.task('clean', ['clean-images', 'clean-styles', 'clean-code']);
+function cleanDist(done) {
+    return clean(config.paths.dist, done);
+}
 
-gulp.task('clean-images', function(done) {
-    clean(config.paths.dist + '/images/**/*.*', done);
-});
-
-gulp.task('clean-styles', function(done) {
-    clean(config.paths.dist + '/**/*.css', done);
-});
-
-gulp.task('clean-code', function(done) {
-    const files = [].$.concat(
-        config.paths.dist + '/scripts/*.js'
-    );
-    clean(files, done);
-});
-
-// gulp.task('clean-code', function(done) {
-//     const files = [].concat(
-//         config.temp + '**/*.js',
-//         config.build + '**/*.html',
-//         config.build + 'js/**/*.js'
-//     );
-//     clean(files, done);
-// });
-
-gulp.task('html', function(){
-	gulp.src(config.paths.html)
+function html() {
+	return gulp.src(config.paths.html)
 	.pipe(gulp.dest(config.paths.dist))
 	.pipe(reload({stream:true}));
-});
+}
 
-gulp.task('js', () => {
-	browserify(config.paths.mainJs)
+function scripts() {
+    log('****** browserify JSX --> JS');
+	return browserify(config.paths.mainJs)
 		.transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
 		.bundle()
 		.on('error', (err) => log(err.stack)) 
 		.pipe(source('bundle.js'))
 		.pipe(buffer())
+        .pipe($.sourcemaps.init({loadMaps: true}))
 		.pipe($.uglify())
+        .on('error', $.util.log)
+        .pipe($.sourcemaps.write('./'))
 		.pipe(gulp.dest(config.paths.dist + '/scripts'))
 		.pipe(reload({stream:true}));
-});
+}
 
-gulp.task('sass', function () {
-	log('Compiling Sass --> CSS');
-	return gulp.src(config.paths.sass)
+function styles() {
+    log('Compiling Sass --> CSS');
+    return gulp.src(config.paths.sass)
 		.pipe($.sass().on('error', $.sass.logError))
 		.pipe($.concat('bundle.css'))
 		.pipe($.csso())
 		.pipe(gulp.dest(config.paths.dist + '/css'))
 		.pipe(reload({stream:true}));
-});
-
-gulp.task('css', function() {
-	gulp.src(config.paths.css)
-		.pipe($.concat('bundle.css'))
-		.pipe(gulp.dest(config.paths.dist + '/css'));
-});
+}
 
 //Migrates images to the dist folder
-gulp.task('images', function(){
-	gulp.src(config.paths.images)
-	.pipe(gulp.dest(config.paths.dist + '/images'))
-	.pipe(reload({stream:true}));
+// gulp.task('images', function(){
+// 	gulp.src(config.paths.images)
+// 	.pipe(gulp.dest(config.paths.dist + '/images'))
+// 	.pipe(reload({stream:true}));
 
-	//publish favicon
-	gulp.src('./src/favicon.ico')
-	.pipe(gulp.dest(config.paths.dist));
-});
+// 	//publish favicon
+// 	gulp.src('./src/favicon.ico')
+// 	.pipe(gulp.dest(config.paths.dist));
+// });
 
-gulp.task('lint', () => {
-	//log('linting tasks');
-    // ESLint ignores files with "node_modules" paths.
-    // So, it's best to have gulp ignore the directory as well.
-    // Also, Be sure to return the stream from the task;
-    // Otherwise, the task may end before the stream has finished.
-    return gulp.src([config.paths.js,'!node_modules/**'])
-        // eslint() attaches the lint output to the "eslint" property
-        // of the file object so it can be used by other modules.
+function lint() {
+    return gulp.src([config.paths.js,'!**/node_modules/**'])
         .pipe($.eslint())
-        // eslint.format() outputs the lint results to the console.
-        // Alternatively use eslint.formatEach() (see Docs).
         .pipe($.eslint.format())
-        // To have the process exit with an error code (1) on
-        // lint error, return the stream and pipe to failAfterError last.
         .pipe($.eslint.failAfterError());
-});
+}
 
-gulp.task('default', ['lint', 'sass', 'js', 'browser-sync'], function() {
-	gulp.watch(config.paths.html, ['html']);
-	gulp.watch(config.paths.js, ['js', 'lint']);
-	gulp.watch(config.paths.sass, ['sass']);
-});
-
-gulp.task('nodemon', function (cb) {
+function nodemon(cb) {
   let called = false;
   const nodeOptions = {
     script: 'server.js',
@@ -152,24 +111,31 @@ gulp.task('nodemon', function (cb) {
     .on('restart', function () {
         log('**** Nodemon restarted!');
     });
-});
+}
 
 
-gulp.task('browser-sync', ['nodemon'], function() {
+function browser(done) {
     if (browserSync.active) {
         return;
     }
 
     log(`*** Startign browserSync on ${config.port}`);
 
-    browserSync.init({
+    return browserSync.init({
         proxy: "localhost:7005"
-    });
-});
+    }, done);
+}
+
+function move(){
+  // the base option sets the relative root for the set of files,
+  // preserving the folder structure
+  return gulp.src(config.paths.toMove, { base: './' })
+  .pipe(gulp.dest(config.paths.dist));
+}
 
 function clean(path, done) {
-  log('Cleaning: ' + $.util.colors.blue(path));
-    del(path, done);
+    log('Cleaning: ' + $.util.colors.blue(path));
+    del(path, done());
 }
 
 function log(msg) {
@@ -183,3 +149,17 @@ function log(msg) {
         $.util.log($.util.colors.blue(msg));
     }
 }
+
+function watch(done) {
+    gulp.watch(config.paths.html, gulp.series(html));
+	gulp.watch(config.paths.js, gulp.series(scripts, lint));
+	gulp.watch(config.paths.sass, gulp.series(styles));
+    done();
+}
+
+const serveDev = gulp.series(html, lint, styles, scripts, nodemon, browser);
+const serveBuild = gulp.series(html, lint, styles, scripts, move);
+
+gulp.task('serveDev', gulp.parallel(serveDev, watch));
+gulp.task('serveBuild', gulp.parallel(serveBuild));
+gulp.task('clean', cleanDist);

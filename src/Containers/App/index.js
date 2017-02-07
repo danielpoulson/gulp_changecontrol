@@ -7,7 +7,7 @@ export default class App extends Component {
 	render() {
 		return (
 			<div>
-				<div className="app-hello-text">Daniel's Website Bitches</div>
+				<div className="app-hello-text">Daniel's Website Rocks with Gulp 4</div>
 				<div className="app-box">Hello Is it me your looking for?</div>
 				<Header></Header>
 			</div>

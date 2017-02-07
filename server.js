@@ -24,6 +24,10 @@ app.use(bodyParser.json());
 
 app.use(express.static('./dist'));
 app.use(require('./server/config/route'));
+<<<<<<< HEAD
+=======
+
+>>>>>>> gulp4
 
 app.get('*', function (req, res) {
     res.render('index.html');
