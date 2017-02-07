@@ -41,7 +41,7 @@
     "del": "^2.2.2",
     "eslint": "^3.15.0",
     "eslint-plugin-import": "^2.2.0",
-    "gulp": "^3.9.1",
+    "gulp": "github:gulpjs/gulp#4.0",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "^5.0.0",
     "gulp-csso": "^2.0.0",
@@ -50,10 +50,10 @@
     "gulp-nodemon": "^2.2.1",
     "gulp-open": "^2.0.0",
     "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.4.1",
     "gulp-uglify": "^2.0.1",
     "gulp-util": "^3.0.8",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "yargs": "^6.6.0"
+    "vinyl-source-stream": "^1.1.0"
   }
 }
