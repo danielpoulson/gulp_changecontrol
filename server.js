@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static('./dist'));
-
+app.use(require('./server/config/route'));
 
 app.get('*', function (req, res) {
     res.render('index.html');
