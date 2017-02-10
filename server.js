@@ -9,7 +9,6 @@ process.env.NODE_ENV = 'development';
 process.env.PORT = 7005;
 
 const app = express();
-//
 
 const config = {
   env: process.env.NODE_ENV
@@ -24,10 +23,6 @@ app.use(bodyParser.json());
 
 app.use(express.static('./dist'));
 app.use(require('./server/config/route'));
-<<<<<<< HEAD
-=======
-
->>>>>>> gulp4
 
 app.get('*', function (req, res) {
     res.render('index.html');
