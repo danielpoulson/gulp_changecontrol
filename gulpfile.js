@@ -16,7 +16,7 @@ const config = {
 	devBaseUrl: 'http://localhost',
 	nodeServer: './server.js',
 	paths: {
-        html: './client/src/*.html',
+        html: './client/*.html',
         js: './client/src/**/*.js',
         sass: [
             './client/node_modules/bootstrap/dist/css/bootstrap.min.css',
