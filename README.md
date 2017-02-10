@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 # SimpleReact
+=======
+# changecontrol
+>>>>>>> master
