@@ -103,14 +103,32 @@ exports.getChangeById = function(req, res) {
 // This function gets the count for **active** tasks and change controls for the logged in user
 exports.getUserDashboard = function(req, res){
   const dashboard = {};
-  let username = '';
   let _barData = [];
+  let username = '';
   dashboard.lineData = server_data.lineData;
   dashboard.barData = server_data.barData;
 
   //TODO: (2) MED There is no limit to the number of years in the bar graph
 
-  Change.aggregate(
+  const promise = Change.count({CC_Stat: {$lt:4}}).exec();
+
+  promise.then(data => {
+    dashboard.allChangeCount = data;
+    return users.getFullname(req.params.user);
+  }).then(data => {
+    username = data[0].fullname;
+    return Change.count({$and: [{CC_Champ: username }, {CC_Stat: {$lt:4}}]});
+  }).then( data => {
+    dashboard.changeCount = data;
+    return tasks.getTasksCountByUser(username);
+  }).then( data => {
+    dashboard.taskCount = data;
+    return tasks.getCountAll();
+  }).then( data => {
+    dashboard.allTaskCount = data;
+    return(dashboard);
+  }).then( data => {
+    Change.aggregate(
     [
       { "$unwind": "$CC_LOG" },
       {
@@ -181,36 +199,17 @@ exports.getUserDashboard = function(req, res){
               }];
 
               dashboard.barData = fakeData.concat(dashboard.barData);
-
-              console.log(dashboard.barData);
           }
 
+          res.send(dashboard);
+
         }
-      )
+      );
     }
   );
-
-
-
-  const promise = Change.count({CC_Stat: {$lt:4}}).exec();
-
-  promise.then(data => {
-    dashboard.allChangeCount = data;
-    return users.getFullname(req.params.user);
-  }).then(data => {
-    username = data[0].fullname;
-    return Change.count({$and: [{CC_Champ: username }, {CC_Stat: {$lt:4}}]});
-  }).then( data => {
-    dashboard.changeCount = data;
-    return tasks.getTasksCountByUser(username);
-  }).then( data => {
-    dashboard.taskCount = data;
-    return tasks.getCountAll();
-  }).then( data => {
-    dashboard.allTaskCount = data;
-    res.send(dashboard);
   });
 };
+
 
 
 exports.dumpChanges = function(req, res) {

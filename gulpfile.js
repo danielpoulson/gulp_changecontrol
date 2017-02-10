@@ -19,12 +19,14 @@ const config = {
         html: './client/src/*.html',
         js: './client/src/**/*.js',
         sass: [
-            './client/src/**/*.*css',
-            './client/node_modules/react-widgets/dist/css/react-widgets.css'
+            './client/node_modules/bootstrap/dist/css/bootstrap.min.css',
+            './client/node_modules/react-widgets/dist/css/react-widgets.css',
+            './client/node_modules/react-select/dist/react-select.min.css',
+            './client/src/**/*.*css'
         ],
         images: './client/src/images/*',
         fonts: [
-            './client/src/styles/bootstrap/fonts/*.*',
+            './client/node_modules/bootstrap/dist/fonts/*.*',
             './client/src/styles/font-awesome/fonts/*.*',
             './client/node_modules/react-widgets/lib/fonts/*.*'
         ],
@@ -82,7 +84,7 @@ function styles() {
     return gulp.src(config.paths.sass)
 		.pipe($.sass().on('error', $.sass.logError))
 		.pipe($.concat('bundle.css'))
-		.pipe($.csso())
+		// .pipe($.csso())
 		.pipe(gulp.dest(config.paths.dist + '/css'))
 		.pipe(reload({stream:true}));
 }
