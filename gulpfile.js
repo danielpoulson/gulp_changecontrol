@@ -16,17 +16,26 @@ const config = {
 	devBaseUrl: 'http://localhost',
 	nodeServer: './server.js',
 	paths: {
-        html: './src/*.html',
-        js: './src/**/*.js',
-        sass: './src/**/*.*css',
-        images: './src/images/*',
+        html: './client/src/*.html',
+        js: './client/src/**/*.js',
+        sass: [
+            './client/src/**/*.*css',
+            './client/node_modules/react-widgets/dist/css/react-widgets.css'
+        ],
+        images: './client/src/images/*',
+        fonts: [
+            './client/src/styles/bootstrap/fonts/*.*',
+            './client/src/styles/font-awesome/fonts/*.*',
+            './client/node_modules/react-widgets/lib/fonts/*.*'
+        ],
         toMove: [
             './server/**/*.*',
             './server.js'
         ],
         dist: './dist',
-        mainJs: './src/index.js',
-        server: './server'
+        mainJs: './client/src/index.js',
+        server: './server',
+        styles: './client/src/styles'
 	}
 };
 
@@ -40,21 +49,33 @@ function html() {
 	.pipe(reload({stream:true}));
 }
 
+// function scripts() {
+//     log('****** browserify JSX --> JS');
+// 	return browserify(config.paths.mainJs)
+// 		.transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
+// 		.bundle()
+//         .on('error', (err) => log(err.stack))
+// 		.on('error', (err) => log(err.toString())) 
+// 		.pipe(source('bundle.js'))
+// 		.pipe(buffer())
+//         .pipe($.sourcemaps.init({loadMaps: true}))
+// 		.pipe($.uglify())
+//         .on('error', $.util.log)
+//         .pipe($.sourcemaps.write('./'))
+// 		.pipe(gulp.dest(config.paths.dist + '/scripts'))
+// 		.pipe(reload({stream:true}));
+// }
+
 function scripts() {
     log('****** browserify JSX --> JS');
 	return browserify(config.paths.mainJs)
-		.transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
-		.bundle()
-		.on('error', (err) => log(err.stack)) 
-		.pipe(source('bundle.js'))
-		.pipe(buffer())
-        .pipe($.sourcemaps.init({loadMaps: true}))
-		.pipe($.uglify())
-        .on('error', $.util.log)
-        .pipe($.sourcemaps.write('./'))
-		.pipe(gulp.dest(config.paths.dist + '/scripts'))
-		.pipe(reload({stream:true}));
-}
+        .transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
+        .bundle()
+        .on('error', (err) => log(err.toString())) 
+        .pipe(source('bundle.js'))
+        .pipe(gulp.dest(config.paths.dist + '/scripts'))
+        .pipe(reload({stream:true}));
+    }
 
 function styles() {
     log('Compiling Sass --> CSS');
@@ -67,15 +88,23 @@ function styles() {
 }
 
 //Migrates images to the dist folder
-// gulp.task('images', function(){
-// 	gulp.src(config.paths.images)
-// 	.pipe(gulp.dest(config.paths.dist + '/images'))
-// 	.pipe(reload({stream:true}));
+function images (done) {
+	gulp.src(config.paths.images)
+	.pipe(gulp.dest(config.paths.dist + '/images'))
+	.pipe(reload({stream:true}));
 
-// 	//publish favicon
-// 	gulp.src('./src/favicon.ico')
-// 	.pipe(gulp.dest(config.paths.dist));
-// });
+	//publish favicon
+	gulp.src('./client/favicon.ico')
+	.pipe(gulp.dest(config.paths.dist));
+
+    done();
+}
+
+function fonts() {
+    log('****** Moving fonts to the fonts folder');  
+    return gulp.src(config.paths.fonts)
+        .pipe(gulp.dest(config.paths.dist + '/fonts/'));
+}
 
 function lint() {
     return gulp.src([config.paths.js,'!**/node_modules/**'])
@@ -157,9 +186,11 @@ function watch(done) {
     done();
 }
 
-const serveDev = gulp.series(html, lint, styles, scripts, nodemon, browser);
+const serveDev = gulp.series(html, images, fonts, lint, styles, scripts, nodemon, browser);
 const serveBuild = gulp.series(html, lint, styles, scripts, move);
 
 gulp.task('serveDev', gulp.parallel(serveDev, watch));
 gulp.task('serveBuild', gulp.parallel(serveBuild));
 gulp.task('clean', cleanDist);
+gulp.task('fonts', fonts);
+gulp.task('images', images);

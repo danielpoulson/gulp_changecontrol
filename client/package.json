@@ -1,0 +1,30 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "flow-bin": "^0.32.0"
+  },
+  "dependencies": {
+    "axios": "^0.9.0",
+    "classnames": "^2.2.3",
+    "d3": "^3.5.16",
+    "d3-tip": "^0.6.7",
+    "lodash": "^3.10.1",
+    "moment": "^2.12.0",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1",
+    "react-dropzone": "^3.3.4",
+    "react-redux": "^4.4.1",
+    "react-router": "^2.0.1",
+    "react-select": "^1.0.0-beta9",
+    "react-transform-hmr": "^1.0.4",
+    "react-widgets": "^3.3.0",
+    "redux": "^3.3.1",
+    "redux-promise": "^0.5.3",
+    "superagent": "^2.2.0",
+    "toastr": "^2.1.2"
+  },
+  "scripts": {
+  }
+}
