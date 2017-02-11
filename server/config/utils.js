@@ -1,6 +1,7 @@
 "use strict";
-const moment = require('moment');
-const path = require('path');
-const rootPath = path.normalize(__dirname + '/../../');
+import moment from 'moment';
+import path from 'path';
+// const rootPath = path.normalize(__dirname + '/../../');
+const rootPath = path.normalize(__dirname + '/../../../');
 
-exports.uploaded = path.normalize(rootPath + '../uploaded/');
+export const uploaded = path.normalize(rootPath + '../uploaded/');

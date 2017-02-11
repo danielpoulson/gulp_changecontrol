@@ -22,6 +22,7 @@ const config = {
             './client/node_modules/bootstrap/dist/css/bootstrap.min.css',
             './client/node_modules/react-widgets/dist/css/react-widgets.css',
             './client/node_modules/react-select/dist/react-select.min.css',
+            './client/node_modules/toastr/build/toastr.min.css',
             './client/src/**/*.*css'
         ],
         images: './client/src/images/*',
@@ -118,7 +119,7 @@ function lint() {
 function nodemon(cb) {
   let called = false;
   const nodeOptions = {
-    script: 'server.js',
+    script: './dist/server/server.js',
     delayTime: 1,
     ext: '.js .html',
     ignore: [
@@ -128,7 +129,7 @@ function nodemon(cb) {
     env: {
       'NODE_ENV': 'development',
       'PORT': 7005
-    },
+    }
   };
 
   return $.nodemon(nodeOptions)
@@ -155,6 +156,13 @@ function browser(done) {
     return browserSync.init({
         proxy: "localhost:7005"
     }, done);
+}
+
+function transformES6(){
+    return gulp.src(['./server/**/*.js'])
+        .pipe($.plumber())
+        .pipe($.babel())
+        .pipe(gulp.dest(config.paths.dist + '/server'));
 }
 
 function move(){
@@ -188,7 +196,7 @@ function watch(done) {
     done();
 }
 
-const serveDev = gulp.series(html, images, fonts, lint, styles, scripts, nodemon, browser);
+const serveDev = gulp.series(html, images, fonts, lint, styles, transformES6, scripts, nodemon, browser);
 const serveBuild = gulp.series(html, lint, styles, scripts, move);
 
 gulp.task('serveDev', gulp.parallel(serveDev, watch));
@@ -196,3 +204,4 @@ gulp.task('serveBuild', gulp.parallel(serveBuild));
 gulp.task('clean', cleanDist);
 gulp.task('fonts', fonts);
 gulp.task('images', images);
+gulp.task('transformES6', transformES6);

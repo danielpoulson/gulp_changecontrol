@@ -6,14 +6,16 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const path = require('path');
 const rootPath = path.normalize(__dirname + '/../../');
-let appViews = rootPath + '/dist';
+let appViews = rootPath + '/';
+// let appViews = rootPath + '/dist';
 
 /*eslint no-console: 0*/
 
 module.exports = function (app, config) {
 
   if (config.env === 'development') {
-    appViews = rootPath + '/dist';
+    // appViews = rootPath + '/dist';
+    appViews = rootPath + '/';
   }
     app.set('views', appViews);
     app.engine('html', require('ejs').renderFile);

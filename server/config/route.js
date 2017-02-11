@@ -8,7 +8,6 @@ const users = require('../controllers/users');
 const multer = require('multer');
 const utils = require('./utils');
 
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, utils.uploaded);
