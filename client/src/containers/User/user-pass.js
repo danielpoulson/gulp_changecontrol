@@ -28,7 +28,6 @@ class UserPass extends Component {
 		const passwords = this.state.passwords;
 		const _name = e.target.name; 
 		passwords[_name] = e.target.value; 
-		console.log(_name);
 
 		this.setState({passwords: passwords});
 	};

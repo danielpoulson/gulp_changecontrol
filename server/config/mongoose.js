@@ -1,17 +1,17 @@
-var mongoose = require('mongoose');
-var userModel = require('../models/User');
-var changeModel = require('../models/Change');
-var projectModel = require('../models/Project');
-var taskModel = require('../models/Task');
-var filesModel = require('../models/File');
+import mongoose from'mongoose';
+import userModel from'../models/User';
+import changeModel from'../models/Change';
+import projectModel from'../models/Project';
+import taskModel from'../models/Task';
+import filesModel from'../models/File';
 
-module.exports = function(config) {
+/*eslint no-console: 0*/
+export default function(config) {
 	mongoose.Promise = global.Promise;
 	mongoose.connect(config.db);
-  var db = mongoose.connection;
+  const db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error...'));
   db.once('open', function callback() {
     console.log('Technical Services db opened');
   });
-
-};
+}

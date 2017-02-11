@@ -2,6 +2,8 @@
 import express from 'express';
 // const auth = require('./server/config/auth');
 import './config/auth';
+import mongoose from './config/mongoose';
+import expressfile from './config/express';
 
 process.env.NODE_ENV = 'development';
 process.env.PORT = 7005;
@@ -9,7 +11,7 @@ process.env.PORT = 7005;
 const app = express();
 
 const config = {
-  db: 'mongodb://localhost/techservices',
+  db: 'mongodb://localhost/changecontrol',
   env: process.env.NODE_ENV
 };
 
@@ -18,8 +20,8 @@ const config = {
 // require('./server/config/passport')();
 // app.use(require('./server/config/route'));
 
-require('./config/express')(app, config);
-require('./config/mongoose')(config);
+expressfile(app, config);
+mongoose(config);
 require('./config/passport')();
 app.use(require('./config/route'));
 
