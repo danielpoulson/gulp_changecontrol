@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { getUserDashboard } from '../../actions/actions_main';
 import { loadPage } from '../../actions/actions_changes';
 import { loadPageTask } from '../../actions/actions_tasks';
-import BarChart from '../../components/graphs/bar-chart';
-import LineChart from '../../components/graphs/line-chart';
+import RechartBarChart from '../../components/graphs/rechart-bar-chart';
+import RechartLineChart from '../../components/graphs/rechart-line-chart';
 
 class Home extends Component {
   constructor(props){
@@ -84,11 +84,11 @@ class Home extends Component {
         <div className="row cc-graph">
           <div className="col-sm-6">
             <h3>Open vs Closed Change Controls</h3>
-            <BarChart />
+            <RechartBarChart />
           </div>
           <div className="col-sm-6">
             <h3>Overdue Tasks</h3>
-            <LineChart />
+            <RechartLineChart />
           </div>
         </div>
       </div>

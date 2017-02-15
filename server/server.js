@@ -1,24 +1,17 @@
 // @flow
 import express from 'express';
-// const auth = require('./server/config/auth');
 import './config/auth';
 import mongoose from './config/mongoose';
 import expressfile from './config/express';
 
 process.env.NODE_ENV = 'development';
-process.env.PORT = 7005;
-
+process.env.PORT = 7005;    
 const app = express();
 
 const config = {
-  db: 'mongodb://localhost/changecontrol',
+  db: 'mongodb://localhost/techservices',
   env: process.env.NODE_ENV
 };
-
-// require('./server/config/express')(app, config);
-// require('./server/config/mongoose')(config);
-// require('./server/config/passport')();
-// app.use(require('./server/config/route'));
 
 expressfile(app, config);
 mongoose(config);

@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var filesSchema = new Schema({
+const filesSchema = new Schema({
 
     fsFileName: {type: String, required: '{PATH} is required!'},
     fsFileExt: {type: String, required: '{PATH} is required!'},
@@ -15,4 +15,4 @@ var filesSchema = new Schema({
 });
 
 
-var File = mongoose.model('File', filesSchema);
+const File = mongoose.model('File', filesSchema);

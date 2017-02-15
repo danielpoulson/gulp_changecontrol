@@ -67,6 +67,7 @@ exports.getLoggedUser = function(req, res) {
 };
 
 exports.getUser = function(req, res) {
+  console.log("getUser");
     const _fullname = req.params.id;
 
     User

@@ -1,31 +1,39 @@
 "use strict";
 /*eslint no-console: 0*/
-const nodemailer = require('nodemailer');
-const mg = require('nodemailer-mailgun-transport');
-const config = require('./config');
-const path = require('path');
+import nodemailer from 'nodemailer';
+import config from './config';
+import path from 'path';
+import fs from 'fs';
 const rootPath = path.normalize(__dirname);
-const fs = require('fs');
+
 
 exports.sendMail = function(toEmail, emailType, emailActivity) {
   const emailSubject = "You have been assigned ownership of a " + emailType;
-  // This is your API key that you retrieve from www.mailgun.com/cp (free up to 10K monthly emails)
 
-  let auth = {
-    auth: config.mailgun
+  let _auth = {
+    type: 'OAuth2',
+    user: config.auth.user,
+    clientId: config.auth.clientId,
+    clientSecret: config.auth.clientSecret,
+    refreshToken: config.auth.refreshToken,
+    accessToken: config.auth.accessToken
   };
 
-  const nodemailerMailgun = nodemailer.createTransport(mg(auth));
+  let transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: _auth
+  });
 
   fs.readFile(rootPath + '/mail.html', 'utf8', function(err, html){
       if (err) {
         console.log('Error: ' + err);
       }
+    
     const _html = '<html><body STYLE="font-size: 12pt/14pt; font-family:sans-serif"><h3>You have been assigned ownership of this '
     + emailType + '</h3></br>' + emailActivity + '</br>' + html + '</body></html>';
 
-    nodemailerMailgun.sendMail({
-        from: 'changecontrol@fmc.com',
+    transporter.sendMail({
+        from: config.auth.user,
         to: toEmail, // An array if you have multiple recipients.
         subject: emailSubject,
         html: _html
@@ -34,6 +42,8 @@ exports.sendMail = function(toEmail, emailType, emailActivity) {
       if (err) {
         console.log('Error: ' + err);
       }
+
+      transporter.close();
     });
   });
 

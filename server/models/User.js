@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var userSchema = new Schema({
+const userSchema = new Schema({
     fullname: {type:String},
     email: {type:String},
     username: {type:String},
@@ -9,5 +9,5 @@ var userSchema = new Schema({
     dept: {type:String},
     role: {type:String}
 });
-
-var User = mongoose.model('User', userSchema);
+//
+const User = mongoose.model('User', userSchema);

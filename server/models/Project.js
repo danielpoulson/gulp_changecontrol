@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+import mongoose from 'mongoose';
+const Schema = mongoose.Schema;
 
-var projectSchema = new Schema({
+const projectSchema = new Schema({
     Id: Number,
     ProjNo: {type: String, required: '{PATH} is required!'},
     Title: {type: String, required: '{PATH} is required!'},
@@ -30,4 +30,4 @@ var projectSchema = new Schema({
     }
 });
 
-var Project = mongoose.model('Project', projectSchema);
+const Project = mongoose.model('Project', projectSchema);

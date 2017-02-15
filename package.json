@@ -5,8 +5,17 @@
   "main": "index.js",
   "scripts": {
     "delete:dist": "del ./dist",
-    "start": "del ./dist && gulp serveDev",
-    "dev:build": "gulp serveDev"
+    "start": "npm-run-all gulpDev copy:* babel:server build:dev",
+    "gulpDev": "del ./dist && gulp compileDev",
+    "gulpProd": "gulp serveBuild",
+    "babel:server": "babel server -d dist/server",
+    "babel-server": "npm-run-all delete:dist compile-server",
+    "dev:nodemon": "nodemon dist/server/server.js",
+    "dev:serve": "gulp serveDev",
+    "build:dev": "npm-run-all --parallel dev:*",
+    "build:prod": "export NODE_ENV=production && npm-run-all gulpProd babel:server copy:*",
+    "copy:packjson": "cpy 'package.json' dist",
+    "copy:html": "cpy 'server/config/mail.html' dist/server/config/"
   },
   "repository": {
     "type": "git",
@@ -38,7 +47,7 @@
     "mongoose-to-csv": "^0.1.0",
     "morgan": "^1.8.0",
     "multer": "^1.1.0",
-    "nodemailer": "^2.3.0",
+    "nodemailer": "^3.1.0",
     "nodemailer-mailgun-transport": "https://github.com/orliesaurus/nodemailer-mailgun-transport.git",
     "passport": "^0.3.0",
     "passport-local": "^1.0.0"
@@ -61,6 +70,7 @@
     "gulp-connect": "^5.0.0",
     "gulp-csso": "^2.0.0",
     "gulp-eslint": "^3.0.1",
+    "gulp-file-cache": "^0.0.1",
     "gulp-load-plugins": "^1.5.0",
     "gulp-nodemon": "^2.2.1",
     "gulp-open": "^2.0.0",
@@ -69,6 +79,7 @@
     "gulp-sourcemaps": "^2.4.1",
     "gulp-uglify": "^2.0.1",
     "gulp-util": "^3.0.8",
+    "npm-run-all": "^4.0.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

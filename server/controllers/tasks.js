@@ -37,7 +37,7 @@ exports.updateTask = function(req, res) {
 
     Task.findOneAndUpdate(query, req.body, function (err) {
         if (err) return handleError(err);
-        res.send(200);
+        res.sendStatus(200);
 
         if(newOwner){
           createEmail(req.body);

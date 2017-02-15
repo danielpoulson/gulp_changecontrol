@@ -54,7 +54,7 @@ class Header extends Component {
             <div className="topband">
                 <section className="col-sm-12 dp-nav-section ">
                     <div className="col-sm-5">
-                        <h3 className="topband_h1">Change Control</h3>
+                        <h3 className="topband_h1">NPI - Change Control</h3>
                     </div>
                     <div className="col-sm-7" style={loginStyle}>
                         {!this.props.fullname ?

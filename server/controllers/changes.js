@@ -191,11 +191,6 @@ exports.getUserDashboard = function(req, res){
                 "_id": 2016,
                 "closed": 0,
                 "open": 0
-              },
-              {
-                "_id": 2017,
-                "closed": 0,
-                "open": 0
               }];
 
               dashboard.barData = fakeData.concat(dashboard.barData);

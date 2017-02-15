@@ -10,6 +10,9 @@ const buffer = require('vinyl-buffer');
 const source = require('vinyl-source-stream'); // Use conventional text streams with Gulp
 const del = require('del');
 const path = require('path');
+const exec = require('child_process').exec;
+const Cache = require('gulp-file-cache');
+const cache = new Cache();
 
 const config = {
 	port: 7005,
@@ -52,33 +55,34 @@ function html() {
 	.pipe(reload({stream:true}));
 }
 
+function scripts() {
+    log('****** browserify JSX --> JS');
+    log(process.env.NODE_ENV);
+	return browserify(config.paths.mainJs)
+		.transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
+		.bundle()
+        .on('error', (err) => log(err.stack))
+		.on('error', (err) => log(err.toString())) 
+		.pipe(source('bundle.js'))
+		.pipe(buffer())
+        .pipe($.sourcemaps.init({loadMaps: true}))
+		.pipe($.uglify())
+        .on('error', $.util.log)
+        .pipe($.sourcemaps.write('./'))
+		.pipe(gulp.dest(config.paths.dist + '/scripts'))
+		.pipe(reload({stream:true}));
+}
+
 // function scripts() {
 //     log('****** browserify JSX --> JS');
 // 	return browserify(config.paths.mainJs)
-// 		.transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
-// 		.bundle()
-//         .on('error', (err) => log(err.stack))
-// 		.on('error', (err) => log(err.toString())) 
-// 		.pipe(source('bundle.js'))
-// 		.pipe(buffer())
-//         .pipe($.sourcemaps.init({loadMaps: true}))
-// 		.pipe($.uglify())
-//         .on('error', $.util.log)
-//         .pipe($.sourcemaps.write('./'))
-// 		.pipe(gulp.dest(config.paths.dist + '/scripts'))
-// 		.pipe(reload({stream:true}));
-// }
-
-function scripts() {
-    log('****** browserify JSX --> JS');
-	return browserify(config.paths.mainJs)
-        .transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
-        .bundle()
-        .on('error', (err) => log(err.toString())) 
-        .pipe(source('bundle.js'))
-        .pipe(gulp.dest(config.paths.dist + '/scripts'))
-        .pipe(reload({stream:true}));
-    }
+//         .transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
+//         .bundle()
+//         .on('error', (err) => log(err.toString())) 
+//         .pipe(source('bundle.js'))
+//         .pipe(gulp.dest(config.paths.dist + '/scripts'))
+//         .pipe(reload({stream:true}));
+//     }
 
 function styles() {
     log('Compiling Sass --> CSS');
@@ -116,34 +120,14 @@ function lint() {
         .pipe($.eslint.failAfterError());
 }
 
-function nodemon(cb) {
-  let called = false;
-  const nodeOptions = {
-    script: './dist/server/server.js',
-    delayTime: 1,
-    ext: '.js .html',
-    ignore: [
-      'dist/**/*.js',
-      'node_modules/**/*.js'
-    ],
-    env: {
-      'NODE_ENV': 'development',
-      'PORT': 7005
-    }
-  };
-
-  return $.nodemon(nodeOptions)
-    .on('start', function () {
-        log('**** Nodemon started!');
-        if (!called) {
-            called = true;
-            cb();
-        }
-    })
-    .on('restart', function () {
-        log('**** Nodemon restarted!');
-    });
-}
+gulp.task('compile', function () {
+  const stream = gulp.src('./server/**/*.js') // your ES2015 code
+                   .pipe(cache.filter()) // remember files
+                   .pipe($.babel()) // compile new ones
+                   .pipe(cache.cache()) // cache them
+                   .pipe(gulp.dest(config.paths.dist + '/server')) // write them
+  return stream; // important for gulp-nodemon to wait for completion
+});
 
 
 function browser(done) {
@@ -156,13 +140,6 @@ function browser(done) {
     return browserSync.init({
         proxy: "localhost:7005"
     }, done);
-}
-
-function transformES6(){
-    return gulp.src(['./server/**/*.js'])
-        .pipe($.plumber())
-        .pipe($.babel())
-        .pipe(gulp.dest(config.paths.dist + '/server'));
 }
 
 function move(){
@@ -193,15 +170,18 @@ function watch(done) {
     gulp.watch(config.paths.html, gulp.series(html));
 	gulp.watch(config.paths.js, gulp.series(scripts, lint));
 	gulp.watch(config.paths.sass, gulp.series(styles));
+	gulp.watch('./server/**/*.js', gulp.series('compile'));
     done();
 }
 
-const serveDev = gulp.series(html, images, fonts, lint, styles, transformES6, scripts, nodemon, browser);
-const serveBuild = gulp.series(html, lint, styles, scripts, move);
+const compileDev = gulp.series(html, images, fonts, lint, styles, scripts);
+const serveBuild = gulp.series(compileDev);
 
-gulp.task('serveDev', gulp.parallel(serveDev, watch));
+gulp.task('serveDev', gulp.parallel(browser, watch));
 gulp.task('serveBuild', gulp.parallel(serveBuild));
+gulp.task('compileDev', compileDev);
 gulp.task('clean', cleanDist);
 gulp.task('fonts', fonts);
 gulp.task('images', images);
-gulp.task('transformES6', transformES6);
+gulp.task('browser', browser);
+gulp.task('watch', watch);

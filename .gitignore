@@ -1,3 +1,6 @@
+# Ignore My Files #
+server/config/config.js
+
 # Ignore Visual Studio  Project #
 ###################
 *.user

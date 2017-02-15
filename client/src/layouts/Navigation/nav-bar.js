@@ -44,7 +44,7 @@ class NavBar extends React.Component {
 
   render() {
     return (
-        <div className="navigation-styles">
+        <div className="cc-navigation-styles">
           <nav className="navbar navbar-default">
             <div className="navbar-collapse collapse">
               <ul className="nav navbar-nav dpHand">
