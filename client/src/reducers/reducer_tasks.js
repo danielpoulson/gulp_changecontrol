@@ -5,8 +5,16 @@ const initialState = {
   alldata: [],
   paged: [],
   ctTotal: 0,
-  ctlist: []
+  //List of the current tasks for selected change
+  ctlist: [],
+  per_page: 15,
+  page: 1
 };
+
+function pagedList(data) {
+  const offset = (initialState.page - 1) * initialState.per_page;
+  return data.slice(offset, offset + initialState.per_page);
+}
 
 function searchIndex(data, index) {
   return data.filter((item) => item._id !== index);
@@ -69,12 +77,21 @@ export default function (state = initialState, action) {
       const index = state.alldata.findIndex(item => item._id === _data._id);
       const ctIndex = state.ctlist.findIndex(item => item._id === _data._id);
 
-      alldata = [
-        ...state.alldata.slice(0, index),
-        // Copy the object before mutating
-        Object.assign({}, _data),
-        ...state.alldata.slice(index + 1)
-      ];
+      if (index === -1) {
+        alldata = [
+          ...state.alldata,
+          _data
+        ];
+      } else {
+        alldata = [
+          ...state.alldata.slice(0, index),
+          // Copy the object before mutating
+          Object.assign({}, _data),
+          ...state.alldata.slice(index + 1)
+        ];
+      }
+
+
 
       ctlist = [
         ...state.ctlist.slice(0, ctIndex),
@@ -83,10 +100,13 @@ export default function (state = initialState, action) {
         ...state.ctlist.slice(ctIndex + 1)
       ];
 
+      paged = pagedList(alldata);
+
       return {
         ...state,
         alldata,
-        ctlist
+        ctlist,
+        paged
       };
     }
 
@@ -114,12 +134,11 @@ export default function (state = initialState, action) {
       };
 
     case GET_TASKS:
+    //Loads on start up and get all the active tasks.
+    //Loads one page of active task from alldata
     // this.props.loadPage(page_num, this.state.numPage, search);
       alldata = action.payload.data;
-      per_page = 15;
-      page = 1;
-      offset = (page - 1) * per_page;
-      paged = alldata.slice(offset, offset + per_page);
+      paged = pagedList(alldata);
 
       return {
         ...state,

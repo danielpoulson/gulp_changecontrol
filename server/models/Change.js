@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const mongooseToCsv = require('mongoose-to-csv'); //https://www.npmjs.com/package/mongoose-to-csv
+const dateFunc = require('../config/date-function');
 
 const changeSchema = new Schema({
     Id: Number,
@@ -34,29 +35,25 @@ changeSchema.plugin(mongooseToCsv, {
     headers: 'CCNo Description Owner TargetDate ClosedDate Company Status',
     constraints: {
         'CCNo': 'CC_No',
-        'Description': 'CC_Descpt',
         'Owner': 'CC_Champ',
-        'Company': 'CC_Comp',
         'Status': 'CC_Stat'
     },
     virtuals: {
+        'Description': function (doc) {
+            const descpt = doc.CC_Descpt.replace(/,/g, "");
+            return descpt;
+        },
+        'Company': function (doc) {
+            const comp = doc.CC_Comp.replace(/,/g, "");
+            return comp;
+        },
         'TargetDate': function (doc) {
-            const dateString = new Date(doc.CC_TDate);
-            const day = dateString.getDay().toString();
-            const mth = dateString.getMonth();
-            const yr = dateString.getYear();
-            let _date = (typeof doc.CC_TDate != 'undefined') ? ('0'+ day ).slice(-2) + '/' + ('0'+ mth ).slice(-2)  + '/' + ('0'+ yr ).slice(-2) : '';
-
+            const _date = (typeof doc.CC_TDate != 'undefined') ? dateFunc.dpFormatDate(doc.CC_TDate) : '';
             return _date;
         },
 
         'ClosedDate': function (doc) {
-            const dateString = new Date(doc.CC_CDate);
-            const day = dateString.getDay().toString();
-            const mth = dateString.getMonth();
-            const yr = dateString.getYear();
-            let _date = (typeof doc.CC_CDate != 'undefined') ? ('0'+ day ).slice(-2) + '/' + ('0'+ mth ).slice(-2)  + '/' + ('0'+ yr ).slice(-2) : '';
-
+            const _date = (typeof doc.CC_CDate != 'undefined') ? dateFunc.dpFormatDate(doc.CC_CDate) : '';
             return _date;
         }
     }

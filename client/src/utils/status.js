@@ -1,3 +1,13 @@
+function dayDiff(date) {
+    let _dayDiff = 0;
+    if (date) {
+        const currentTime = Math.ceil(new Date() / (1000 * 3600 * 24));
+        const logTime = Math.ceil(new Date(date) / (1000 * 3600 * 24));
+        _dayDiff = currentTime - logTime;
+    }
+    return _dayDiff;
+}
+
 export function getExt(ext) {
   let styled = '';
 
@@ -87,4 +97,21 @@ export function getStatCC(status) {
   }
 
   return styled;
+}
+
+export function getTraffic(date, taskstatus) {
+  let _status = 'fa fa-check-square fa-lg';
+  
+  if (taskstatus === 5) { 
+    _status = 'fa fa-flag-checkered fa-lg' ;
+  } else {
+    const _diff = dayDiff(date, 0);
+
+    if (_diff > 0 ) {
+      _status = 'fa fa-exclamation-triangle fa-lg';
+    } else if (_diff <= 0 &&  _diff >= -7 ) {
+      _status = 'fa fa-warning fa-lg';
+    }
+  }
+  return _status;
 }

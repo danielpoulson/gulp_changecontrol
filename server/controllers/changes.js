@@ -224,7 +224,7 @@ exports.dumpChanges = function(req, res) {
     fileData.fsFilePath = 'changes' + int + '.csv';
     fileData.fsBooked = 0;
 
-    files.addExportFile(fileData);
+    files.addExportFile(fileData);//
 
     const _search = !req.body.search ? "." : req.body.search;
     const regExSearch = new RegExp(_search + ".*", "i");

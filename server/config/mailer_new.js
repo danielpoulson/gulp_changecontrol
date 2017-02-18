@@ -1,7 +1,6 @@
 "use strict";
 /*eslint no-console: 0*/
 import nodemailer from 'nodemailer';
-import xoauth2 from 'xoauth2';
 import config from './config';
 import path from 'path';
 import fs from 'fs';
@@ -11,15 +10,23 @@ const rootPath = path.normalize(__dirname);
 exports.sendMail = function(toEmail, emailType, emailActivity) {
   const emailSubject = "You have been assigned ownership of a " + emailType;
 
- let _auth = {
-        xoauth2: xoauth2.createXOAuth2Generator({
-            user: config.auth.user,
-            clientId: config.auth.clientId,
-            clientSecret: config.auth.clientSecret,
-            refreshToken: config.auth.refreshToken,
-            accessToken: config.auth.accessToken
-        })
-    };
+  let _auth = {
+    type: 'OAuth2',
+    user: config.auth.user,
+    clientId: config.auth.clientId,
+    clientSecret: config.auth.clientSecret,
+    refreshToken: config.auth.refreshToken,
+    accessToken: config.auth.accessToken
+  };
+  // let _auth = {
+  //   xoAuth2: {
+  //     user: config.auth.user,
+  //     clientId: config.auth.clientId,
+  //     clientSecret: config.auth.clientSecret,
+  //     refreshToken: config.auth.refreshToken,
+  //     accessToken: config.auth.accessToken
+  //   }
+  // };
 
   let transporter = nodemailer.createTransport({
     service: 'Gmail',

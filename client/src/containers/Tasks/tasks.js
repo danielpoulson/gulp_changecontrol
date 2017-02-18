@@ -13,7 +13,7 @@ class Tasks extends Component {
     super(props);
     this.state = {
         activePage: 0,
-        paged: {},
+        paged: props.tasks.paged,
         count: 0,
         numPage: 15,
         txtSearch: ''
@@ -34,6 +34,10 @@ class Tasks extends Component {
 
     this.setState({ txtSearch: search });
     this.onChange(1, search);
+  }
+
+  componentDidMount() {
+    //
   }
 
   onChange(page_num, searchText, column) {
@@ -114,7 +118,7 @@ class Tasks extends Component {
         </div>
 
         <TaskList
-          tasklist={this.props.tasks.paged}
+          tasklist={this.state.paged}
           type="All" />
 
         </div>

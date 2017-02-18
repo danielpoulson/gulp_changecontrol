@@ -55,7 +55,7 @@ function html() {
 	.pipe(reload({stream:true}));
 }
 
-function scripts() {
+function scripts_build() {
     log('****** browserify JSX --> JS');
     log(process.env.NODE_ENV);
 	return browserify(config.paths.mainJs)
@@ -73,16 +73,16 @@ function scripts() {
 		.pipe(reload({stream:true}));
 }
 
-// function scripts() {
-//     log('****** browserify JSX --> JS');
-// 	return browserify(config.paths.mainJs)
-//         .transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
-//         .bundle()
-//         .on('error', (err) => log(err.toString())) 
-//         .pipe(source('bundle.js'))
-//         .pipe(gulp.dest(config.paths.dist + '/scripts'))
-//         .pipe(reload({stream:true}));
-//     }
+function scripts() {
+    log('****** browserify JSX --> JS');
+	return browserify(config.paths.mainJs)
+        .transform("babelify", {presets: ["es2015", "react", "stage-0"]}, {plugins: ["transform-flow-strip-types"]})
+        .bundle()
+        .on('error', (err) => log(err.toString())) 
+        .pipe(source('bundle.js'))
+        .pipe(gulp.dest(config.paths.dist + '/scripts'))
+        .pipe(reload({stream:true}));
+    }
 
 function styles() {
     log('Compiling Sass --> CSS');
@@ -120,7 +120,7 @@ function lint() {
         .pipe($.eslint.failAfterError());
 }
 
-gulp.task('compile', function () {
+gulp.task('compileES6', function () {
   const stream = gulp.src('./server/**/*.js') // your ES2015 code
                    .pipe(cache.filter()) // remember files
                    .pipe($.babel()) // compile new ones
@@ -170,15 +170,17 @@ function watch(done) {
     gulp.watch(config.paths.html, gulp.series(html));
 	gulp.watch(config.paths.js, gulp.series(scripts, lint));
 	gulp.watch(config.paths.sass, gulp.series(styles));
-	gulp.watch('./server/**/*.js', gulp.series('compile'));
+	gulp.watch('./server/**/*.js', gulp.series('compileES6'));
     done();
 }
 
-const compileDev = gulp.series(html, images, fonts, lint, styles, scripts);
-const serveBuild = gulp.series(compileDev);
+const compile = gulp.series(html, images, fonts, lint, styles);
+const serveBuild = gulp.series(compile, scripts_build);
+const compileDev = gulp.series(compile, scripts);
 
 gulp.task('serveDev', gulp.parallel(browser, watch));
-gulp.task('serveBuild', gulp.parallel(serveBuild));
+gulp.task('serveBuild', serveBuild);
+gulp.task('compile', compile);
 gulp.task('compileDev', compileDev);
 gulp.task('clean', cleanDist);
 gulp.task('fonts', fonts);

@@ -9,6 +9,7 @@ const json2csv = require('json2csv');
 const mailer = require('../config/mailer.js');
 const moment = require('moment');
 const utils = require('../config/utils');
+const dateFunc = require('../config/date-function');
 
 
 exports.getTasks = function(req, res) {
@@ -147,7 +148,7 @@ exports.dumpTasks = function(req, res) {
 function getChangesList(int) {
     const status = 4;
     const file = utils.uploaded + 'tasks' + int + '.csv';
-    const fields = ['SourceId', '_name', 'TKName', 'TKTarg', 'TKStart', 'TKChamp', 'TKStat'];
+    const fields = ['SourceId', '_name', 'TKName', 'TKStart', 'TKTarg', 'TKChamp', 'TKStat'];
 
     Change.find({CC_Stat: {$lt:status}})
         .select({ CC_No: 1, CC_Descpt: 1, _id:0 })
@@ -162,12 +163,12 @@ function getChangesList(int) {
 
                     const reformattedArray = coll.map(function(obj){
 
-                        const TKName = obj.TKName;
-                        const TKTarg = moment(obj.TKTarg).format("L");
-                        const TKStart = moment(obj.TKStart).format("L");
+                        const TKName = obj.TKName.replace(/,/g, "");
+                        const TKStart = (typeof obj.TKStart != 'undefined') ? dateFunc.dpFormatDate(obj.TKStart) : '';                        
+                        const TKTarg = (typeof obj.TKTarg != 'undefined') ? dateFunc.dpFormatDate(obj.TKTarg) : '';
                         const TKChamp = obj.TKChamp;
                         let TKStat = null;
-                        const SourceId = obj.SourceId;
+                        const SourceId = obj.SourceId.replace(/,/g, "");
 
                         switch (obj.TKStat) {
                             case 1 :

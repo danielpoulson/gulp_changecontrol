@@ -4,9 +4,9 @@
   "description": "Change Control Program",
   "main": "index.js",
   "scripts": {
+    "compile:dev": "gulp compileDev",
     "delete:dist": "del ./dist",
-    "start": "npm-run-all gulpDev copy:* babel:server build:dev",
-    "gulpDev": "del ./dist && gulp compileDev",
+    "start": "npm-run-all delete:dist compile:dev copy:* babel:server build:dev",
     "gulpProd": "gulp serveBuild",
     "babel:server": "babel server -d dist/server",
     "babel-server": "npm-run-all delete:dist compile-server",
@@ -47,10 +47,11 @@
     "mongoose-to-csv": "^0.1.0",
     "morgan": "^1.8.0",
     "multer": "^1.1.0",
-    "nodemailer": "^3.1.0",
+    "nodemailer": "^2.4.2",
     "nodemailer-mailgun-transport": "https://github.com/orliesaurus/nodemailer-mailgun-transport.git",
     "passport": "^0.3.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "xoauth2": "^1.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
