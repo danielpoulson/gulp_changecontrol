@@ -1,5 +1,6 @@
 # Ignore My Files #
 server/config/config.js
+.gulp-cache
 
 # Ignore Visual Studio  Project #
 ###################
