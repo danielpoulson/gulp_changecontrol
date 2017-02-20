@@ -168,7 +168,7 @@ class Changes extends Component {
           </div>
         </div>
 
-
+//
         <div className="">
           <ChangeList
             changelist={this.props.changes.paged}

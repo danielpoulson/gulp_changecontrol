@@ -1,42 +1,11 @@
 import { GET_CHANGES, ADD_CHANGE, EDIT_CHANGE, LOAD_PAGE_CHANGES } from '../actions/actions_changes';
-import _ from 'lodash';
+import { pagedList, removeByIndex, searchData } from '../utils/data-functions';
 
 const initialState = {
   alldata: [],
   paged: [],
-  per_page: 15,
-  page: 1
+  columns: ['CC_No', 'CC_Descpt', 'CC_Champ']
 };
-
-function pagedList(data, page) {
-  const _page = page || initialState.page;
-  const offset = (_page - 1) * initialState.per_page;
-  return data.slice(offset, offset + initialState.per_page);
-}
-
-function searchData(data, searchText, sortColumn) {
-  function search(item) {
-    const reg1 = new RegExp(`${searchText}.*`, 'i');
-
-    if (item.CC_No.match(reg1) || item.CC_Descpt.match(reg1) || item.CC_Champ.match(reg1)) {
-      return true;
-    }
-    return false;
-  }
-
-  if (searchText === null) {
-    return _.sortBy(data, sortColumn);
-  }
-
-  let _sortColumn = '';
-  _sortColumn = sortColumn || 'CC_No';
-  const newList = _.chain(data).filter(search).sortBy(_sortColumn).value();
-  return newList;
-}
-
-function removeByIndex(data, index) {
-  return data.filter((item) => item._id !== index);
-}
 
 export default function (state, action) {
   let alldata = [];
@@ -117,7 +86,7 @@ export default function (state, action) {
       page = action.data.page_num || 1;
       offset = (page - 1) * per_page;
       searchText = action.data.search;
-      const searcheddata = searchData(state.alldata, searchText, column);
+      const searcheddata = searchData(state.alldata, searchText, column, initialState.columns);
       paged = pagedList(searcheddata, page);
 
       return {

@@ -1,5 +1,5 @@
 import { ADD_TASK, EDIT_TASK, DELETE_TASK, GET_TASKS, LOAD_PAGE_TASKS, GET_PROJECT_TASKS } from '../actions/actions_tasks';
-import _ from 'lodash';
+import { pagedList, removeByIndex, searchData } from '../utils/data-functions';
 
 const initialState = {
   alldata: [],
@@ -8,37 +8,12 @@ const initialState = {
   //List of the current tasks for selected change
   ctlist: [],
   per_page: 15,
-  page: 1
+  page: 1,
+  columns: ['SourceId', 'TKChamp', 'TKName']
 };
 
-function pagedList(data) {
-  const offset = (initialState.page - 1) * initialState.per_page;
-  return data.slice(offset, offset + initialState.per_page);
-}
-
-function searchIndex(data, index) {
-  return data.filter((item) => item._id !== index);
-}
-
-function searchData(data, searchText, sortColumn) {
-  function search(item) {
-    const reg1 = new RegExp(`${searchText}.*`, 'i');
-
-    if (item.SourceId.match(reg1) || item.TKChamp.match(reg1) || item.TKName.match(reg1)) {
-      return true;
-    }
-    return false;
-  }
-
-  if (searchText === null) {
-    return _.sortBy(data, sortColumn);
-  }
-
-  let _sortColumn = '';
-  _sortColumn = sortColumn || 'TKTarg';
-  const newList = _.chain(data).filter(search).sortBy(_sortColumn).value();
-  return newList;
-}
+//TODO: (3) MED ctlist should (or should ... good idea?) be filtered from the 'alldata' list
+//Like pagedList is
 
 export default function (state = initialState, action) {
   let alldata = [];
@@ -112,8 +87,8 @@ export default function (state = initialState, action) {
 
     case DELETE_TASK: {
       const _id = action.payload;
-      alldata = searchIndex(state.alldata, _id);
-      ctlist = searchIndex(state.ctlist, _id);
+      alldata = removeByIndex(state.alldata, _id);
+      ctlist = removeByIndex(state.ctlist, _id);
       ctTotal = ctlist.length;
       return {
         ...state,
@@ -156,8 +131,8 @@ export default function (state = initialState, action) {
       page = action.data.page_num || 1;
       offset = (page - 1) * per_page;
       searchText = action.data.search;
-      const searcheddata = searchData(state.alldata, searchText, column);
-      paged = searcheddata.slice(offset, offset + per_page);
+      const searcheddata = searchData(state.alldata, searchText, column, initialState.columns);
+      paged = pagedList(searcheddata, page);
 
       return {
         ...state,
