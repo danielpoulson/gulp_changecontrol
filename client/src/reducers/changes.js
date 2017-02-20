@@ -3,8 +3,16 @@ import _ from 'lodash';
 
 const initialState = {
   alldata: [],
-  paged: []
+  paged: [],
+  per_page: 15,
+  page: 1
 };
+
+function pagedList(data, page) {
+  const _page = page || initialState.page;
+  const offset = (_page - 1) * initialState.per_page;
+  return data.slice(offset, offset + initialState.per_page);
+}
 
 function searchData(data, searchText, sortColumn) {
   function search(item) {
@@ -54,9 +62,11 @@ export default function (state, action) {
         ...state.alldata,
         _data
       ];
+      paged = pagedList(alldata);
       return {
         ...state,
-        alldata
+        alldata,
+        paged
       };
 
     case EDIT_CHANGE:
@@ -69,6 +79,7 @@ export default function (state, action) {
         Object.assign({}, _data),
         ...state.alldata.slice(index + 1)
       ];
+      paged = pagedList(alldata);
       return {
         paged,
         alldata
@@ -77,7 +88,7 @@ export default function (state, action) {
       case 'DELETE_CHANGE': {
         const _id = action.payload;
         alldata = removeByIndex(state.alldata, _id);
-        paged = removeByIndex(state.paged, _id);
+        paged = pagedList(alldata);
 
         return {
           ...state,
@@ -88,10 +99,7 @@ export default function (state, action) {
 
     case GET_CHANGES:
       alldata = action.payload.data;
-      per_page = 15;
-      page = 1;
-      offset = (page - 1) * per_page;
-      paged = alldata.slice(offset, offset + per_page);
+      paged = pagedList(alldata);
 
       return {
         searchText: null,
@@ -110,7 +118,7 @@ export default function (state, action) {
       offset = (page - 1) * per_page;
       searchText = action.data.search;
       const searcheddata = searchData(state.alldata, searchText, column);
-      paged = searcheddata.slice(offset, offset + per_page);
+      paged = pagedList(searcheddata, page);
 
       return {
         ...state,
