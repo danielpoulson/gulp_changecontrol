@@ -28,7 +28,7 @@ exports.sendMail = function(toEmail, emailType, emailActivity) {
 
   fs.readFile(rootPath + '/mail.html', 'utf8', function(err, html){
       if (err) {
-        console.log('Error: ' + err);
+        console.log('Error Reading html file: ' + err);
       }
     
     const _html = '<html><body STYLE="font-size: 12pt/14pt; font-family:sans-serif"><h3>You have been assigned ownership of this '
@@ -42,7 +42,7 @@ exports.sendMail = function(toEmail, emailType, emailActivity) {
       },
       function (err, info) {
       if (err) {
-        console.log('Error: ' + err);
+        console.log('Error sending mail: ' + err);
       }
 
       transporter.close();
